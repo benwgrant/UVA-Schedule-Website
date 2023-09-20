@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+{% block class_table_content %}
+<html>
+  <head>
+    <title>Class Data</title>
+    <style>
+      table {
+        width: 50%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+      }
+
+      table th, table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ccc;
+        height: 70px;
+      }
+
+      table thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f8f8f8;
+      }
+
+      table tbody tr:hover {
+        background-color: #e0e0e0;
+      }
+
+      table tbody tr td:first-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .search-again-link {
+        font-size: 24px;
+        text-decoration: none;
+        color: #3d7ef8;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .search-again-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+        background-color: #e9ecef;
+      }
+
+    </style>
+  </head>
+  <a href="/searchPage" class="search-again-link"> Search Again? </a>
+
+  <div class="pagination">
+    <span class="step-links">
+        {% if page > 1 %}
+            <a href="{{ request.get_full_path }}&page=1">&laquo; first</a>
+            <a href="{{ request.get_full_path }}&page={{ page|add:"-1" }}">previous</a>
+        {% endif %}
+
+        <span class="current-page">
+            Page {{ page }} of {{ numPages }}.
+        </span>
+
+        {% if page < numPages %}
+            <a href="{{ request.get_full_path }}&page={{ page|add:"1" }}">next</a>
+            <a href="{{ request.get_full_path }}&page={{ numPages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+    </div>
+
+<!-- this displays the table and puts a button at the end of each row to choose the class-->
+<table id = "data">
+  <thead>
+    <tr> 
+      <th>Course ID</th>
+      <th>Component</th>
+      <th>Subject</th>
+      <th>Catalog Number</th>
+      <th>Name</th>
+      <th>Instructor</th>
+      <th>Choose Class</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for _, row in df.iterrows %} 
+      <tr>
+        {% for value in row.values %}
+          <td> {{ value }} </td>
+        {% endfor %}
+        <td>
+          <form action = "/displaySections" method = "POST">
+            {% csrf_token %}
+            <input type = "hidden" name = "catalog_nbr" value ="{{row.catalog_nbr}}">
+            <input type = "hidden" name = "subject" value ="{{row.subject}}">
+            <button type = "submit">Choose</button>
+          </form>
+        </td>
+      </tr>
+    {% empty %}
+      <h2>No Results</h2>
+    {% endfor %}
+  </tbody>
+</table>
+</html>
+{% endblock %}

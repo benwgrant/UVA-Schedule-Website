@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+{% block class_table_content %}
+<html>
+  <head>
+    <title>Class Data</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+      }
+
+      table th, table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ccc;
+      }
+
+      table thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f8f8f8;
+      }
+
+      table tbody tr:hover {
+        background-color: #e0e0e0;
+      }
+
+      table tbody tr td:first-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .search-again-link {
+        font-size: 24px;
+        text-decoration: none;
+        color: #3d7ef8;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .search-again-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+        background-color: #e9ecef;
+      }
+
+    </style>
+  </head>
+  <a href="/displayCart" class="search-again-link" style="background-color:Yellow"> Add More? </a>
+  
+<!-- Displays the schedules for the user to see -->
+
+{% if not emptySchedulesBool %}
+
+{% for schedule in all_schedules%}
+
+<br>
+
+<h2> Schedule: </h2>
+
+{% if schedule.is_approved%}
+
+<h3> <strong>Note:</strong> This Schedule Was Approved by Your Advisor </h3>
+
+{% elif schedule.is_sent%}
+
+<h3> <strong>Note:</strong> This Schedule is Awaiting Approval from Your Advisor </h3>
+
+{% endif %}
+
+{% if schedule.is_sent and not schedule.is_approved%}
+
+<h3> <strong>Note:</strong> This Schedule Has Been Sent to Your Advisor for Approval</h3>
+
+{% elif not schedule.is_approved%} 
+
+<h3> <strong>Note:</strong> This Schedule Has Not Been Sent to Your Advisor for Approval</h3>
+
+{% endif %}
+
+<table>
+    <thead>
+        <tr>
+            <th>Class Subject</th>
+            <th>Class Number</th>
+            <th>Catalog Number</th>
+            <th>Class Type</th>
+            <th>Class Description</th>
+            <th>Class Instructor</th>
+            <th>Class Days</th>
+            <th>Class Start Time</th>
+            <th>Class End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for class in schedule.classes.all %}
+        <tr>
+            <td> {{ class.subject}}</td>
+            <td> {{ class.class_nbr }}</td>
+            <td> {{ class.catalog_nbr }}</td>
+            <td> {{ class.component }} </td>
+            <td> {{ class.descr }}</td>
+            <td> {{ class.instructor }}</td>
+            <td> {{ class.days}}</td>
+            <td> {{ class.start_time }}</td>
+            <td> {{ class.end_time }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<form action = "/deleteSchedule" method = "POST" class="search-again-link">
+    {% csrf_token %}
+    <input type = "hidden" name = "id" value ="{{schedule.id}}">
+    <button type = "submit"> Delete Schedule? </button>
+</form>
+
+{% if not schedule.is_sent %}
+<form action = "/sendSchedule" method = "POST" class="search-again-link">
+  {% csrf_token %}
+  <input type = "hidden" name = "id" value ="{{schedule.id}}">
+  <button type = "submit"> Send Schedule to Advisor? </button>
+</form>
+{% else %}
+<form action = "/sendSchedule" method = "GET" class="search-again-link">
+  {% csrf_token %}
+  <input type = "hidden" name = "id" value ="{{schedule.id}}">
+  <button type = "submit"> Un-send Schedule to Advisor? </button>
+</form>
+{% endif %}
+{% endfor %}
+
+{% else %}
+
+<h2> <strong>Note:</strong> You Haven't Saved any Schedules! Save one From Your Cart!</h2>
+
+{% endif %}
+
+</html>
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+{% block class_table_content %}
+<html>
+  <head>
+    <title>Class Data</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+      }
+
+      table th, table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ccc;
+      }
+
+      table thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f8f8f8;
+      }
+
+      table tbody tr:hover {
+        background-color: #e0e0e0;
+      }
+
+      table tbody tr td:first-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .search-again-link {
+        font-size: 24px;
+        text-decoration: none;
+        color: #3d7ef8;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .search-again-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+        background-color: #e9ecef;
+      }
+
+    </style>
+  </head>
+  
+
+
+{% if not emptyCartBool %}
+
+<!-- Displays the cart for the user to see -->
+
+<a href="/searchPage" class="search-again-link" style="background-color:Yellow"> Add More? </a>
+
+<header> <strong>Cart:</strong></header>
+  
+<table>
+    <thead>
+        <tr>
+            <th>Class Subject</th>
+            <th>Class Number</th>
+            <th>Catalog Number</th>
+            <th>Class Type</th>
+            <th>Class Description</th>
+            <th>Class Instructor</th>
+            <th>Class Days</th>
+            <th>Class Start Time</th>
+            <th>Class End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for class in cart.classes.all %}
+        <tr>
+            <td> {{ class.subject }}</td>
+            <td> {{ class.class_nbr }}</td>
+            <td> {{ class.catalog_nbr }}</td>
+            <td> {{ class.component }} </td>
+            <td> {{ class.descr }}</td>
+            <td> {{ class.instructor }}</td>
+            <td> {{ class.days }}</td>
+            <td> {{ class.start_time }}</td>
+            <td> {{ class.end_time }}</td>
+            <td>
+              {% if class.isLecture %}
+              <form action = "/deleteClass" method = "POST">
+                {% csrf_token %}
+                <input type = "hidden" name = "catalog_nbr" value ="{{class.catalog_nbr}}">
+                <input type = "hidden" name = "class_nbr" value ="{{class.class_nbr}}">
+                <button type = "submit">Delete</button>
+              </form>
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+
+<form action = "/displaySchedules" method="POST">
+  {% csrf_token %}
+  <input type = "submit" value = "Save Schedule?" >
+</form>
+
+
+{% else %}
+
+<br>
+
+<a href="/searchPage" class="search-again-link"> Search For a Class? </a>
+
+<br>
+
+<h2><strong>Note:</strong> Cart is Currently Empty, Add a Class!</h2>
+
+{% endif %}
+
+
+<br>
+
+{% if conflictBool %}
+
+<h3> <strong>ERROR:</strong> There Exists a Conflict Between One or More Classes and The Added Class.</h3>
+
+{% endif %}
+
+{% if duplicateClass %} 
+
+<h3> <strong>ERROR:</strong> This Class Has Already Been Added to The Cart, Please Remove it and Try Again.</h3>
+
+{% endif %}
+
+</html>
+{% endblock %}

@@ -1,0 +1,124 @@
+
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+
+{% block class_table_content %}
+<html>
+  <head>
+    <title>Class Data</title>
+    <style>
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-family: Arial, sans-serif;
+      }
+
+      table th, table td {
+        padding: 8px;
+        text-align: left;
+        border: 1px solid #ccc;
+      }
+
+      table thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+
+      table tbody tr:nth-child(even) {
+        background-color: #f8f8f8;
+      }
+
+      table tbody tr:hover {
+        background-color: #e0e0e0;
+      }
+
+      table tbody tr td:first-child {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+      }
+
+      .search-again-link {
+        font-size: 24px;
+        text-decoration: none;
+        color: #3d7ef8;
+        padding: 10px;
+        border-radius: 5px;
+      }
+
+      .search-again-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+        background-color: #e9ecef;
+      }
+
+    </style>
+  </head>
+  <a href="/searchPage" class="search-again-link"> Search Again? </a>
+
+
+{% if addingNonLecComp %}
+
+<h2> <strong>Note:</strong> Class Has a Non-Lecture Component, Please Choose One From the List Below:</h2>
+
+{% endif %}
+
+<!-- Displays the table with an add to cart button attached to the end.-->
+
+<table id = "data">
+    <thead>
+        <tr>
+          <th>Course ID</th>
+          <th>Class Section</th>
+          <th>Class Number</th>
+          <th>Component</th>
+          <th>LectureInfo</th>
+          <th>Subject</th>
+          <th>Catalog Number</th>
+          <th>Capacity</th>
+          <th>Enrolled</th>
+          <th>Available</th>
+          <th>Name</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Days</th>
+          <th>Room Number</th>
+          <th>Instructor</th>
+          <th>Instructor Email</th>
+          <th> Add </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for _, row in df.iterrows %}
+            <tr>
+            {% for value in row.values %}
+                <td> {{ value }} </td>
+            {% endfor %}
+                <td>
+                    <form action = "/displayCart" method = "POST">
+                    {% csrf_token %}
+                    <input type = "hidden" name = "catalog_nbr" value ="{{row.catalog_nbr}}">
+                    <input type = "hidden" name = "class_nbr" value ="{{row.class_nbr}}"> 
+                    <button type = "submit">Add To Cart</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+    </tbody>
+</table>
+
+
+{% if addingNonLecComp %}
+
+<h2> <strong>Note:</strong> If for Some Reason You Do Not Need The LAB/DIS, Click Home on the Navbar</h2>
+
+{% endif %}
+
+</html>
+{% endblock %}
+

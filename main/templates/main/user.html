@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+  <h1>Hello User: <strong>{{request.user.username}}</strong> </h1>
+
+  <!-- If the user has not chosen a major, they will choose one and then we will randomly choose an advisor from that subject for them. -->
+  
+  {% if not chosenBool %}
+
+  <h1> Please provide your subject:</h1>
+
+  <h2> (We will assign a random advisor pertaining to the provided subject)</h2>
+
+  <form action = '/generateAdvisor' method = "GET">
+    {% csrf_token %}
+    <label for = "dropdown"> <strong>Select a subject: </strong> </label>
+    <select id = "dropdown" name = "subject">
+      {% for subject in subjectList %}
+      <option value="{{ subject }}">{{ subject }} </option> 
+      {% endfor%}
+    </select>
+    <button type = "submit">Select</button>
+  </form>
+{% endif %}
+
+<!-- This means they have chosen a major already and we need to display their randomly chosen advisor -->
+
+{% if chosenBool %}
+
+<h2>Your advisor is {{ advisor.instructor_name}} ( Username: {{advisor.username}}) and their subject is {{advisor.advisor_subject}} </h2>
+
+<form action = "/generateAdvisor" method = "POST"> 
+{% csrf_token %}
+
+<button type = "submit">Change Subject?</button>
+
+</form>
+
+<br>
+
+{% endif%}
+
+<!-- The code below allows a user to request a specific advisor irregardless of major -->
+
+{% if not chosenBool %}
+
+<h2>---------------------OR---------------------</h2>
+
+<form action = "/chooseAdvisor" method = "POST">
+  {% csrf_token %}
+  
+  <strong>Please Enter a Valid Advisor Username: </strong><input type="text" id = 'advisor' name="advisor_username">
+
+  <button type = "submit" >Choose Advisor</button>
+
+</form>
+
+{% endif %}
+
+<div style="position:absolute; bottom:0; padding:10px">
+  <!-- The code below allows a User account to be converted to an Advisor account-->
+
+  <form action = "/convertToAdvisor" method = "POST"> 
+
+    {% csrf_token %}
+
+    <button type = "submit"> Convert account into advisor (deletes data, but can convert back)</button>
+
+    <select id = "subjectFooter" name = "subjectFooter">
+      {% for subject in subjectList %}
+      <option value="{{ subject }}">{{ subject }} </option> 
+      {% endfor%}
+    </select>
+
+    <input type="text" id = 'advPass' name="advPass" placeholder="(Access Key)">
+
+  </form>
+</div>
+
+{% endblock %}
+
+

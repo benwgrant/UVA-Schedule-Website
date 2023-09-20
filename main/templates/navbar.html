@@ -1,0 +1,71 @@
+{% load static %}
+{% with active_page=request.resolver_match.url_name %}
+
+<ul class="navbar-nav">
+  {% if request.user.is_authenticated %}
+
+    {% if request.path == '/user/' or request.path == '/superuser/'%}
+      <b><li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Home</a>
+      </li></b>
+    {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'index' %}">Home</a>
+      </li>
+    {% endif %}
+
+    {% if active_page != 'superuser' %}
+
+        {% if active_page == 'searchPage' or active_page == 'displayClasses' or active_page == 'displaySections' %}
+          <b><li class="nav-item">
+            <a class="nav-link" href="{% url 'searchPage' %}">Course Search</a>
+          </li></b>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'searchPage' %}">Course Search</a>
+          </li>
+        {% endif %}
+        
+        {% if active_page == 'displayCart' %}
+          <b><li>
+            <a class = "nav-link" href = "{% url 'displayCart' %}">Cart</a>
+          </li></b>
+        {% else %}
+          <li>
+            <a class = "nav-link" href = "{% url 'displayCart' %}">Cart</a>
+          </li>
+        {% endif %}
+        
+        {% if active_page == 'saveCartToSchedule' %}
+          <b><li> 
+            <a class = "nav-link" href = "/displaySchedules">Schedules</a>
+          </li></b>
+        {% else %}
+          <li> 
+            <a class = "nav-link" href = "/displaySchedules">Schedules</a>
+          </li>
+        {% endif %}
+
+    {% endif %}
+
+    {% if active_page != 'account_logout' %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'account_logout' %}">Sign Out</a>
+      </li>
+    {% endif %}
+
+    {% else %}
+      {% if active_page != 'account_login' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'account_login' %}">Sign In</a>
+        </li>
+      {% endif %}
+      {% if active_page != 'account_signup' %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'account_signup' %}">Sign Up</a>
+        </li>
+      {% endif %}
+    {% endif %}
+</ul>
+
+{% endwith %}

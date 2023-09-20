@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  Logged in! - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<html>
+
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: Arial, sans-serif;
+    }
+
+    table th, table td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid #ccc;
+    }
+
+    table thead th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    table tbody tr:nth-child(even) {
+      background-color: #f8f8f8;
+    }
+
+    table tbody tr:hover {
+      background-color: #e0e0e0;
+    }
+
+    table tbody tr td:first-child {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+    }
+
+    .search-again-link {
+      font-size: 24px;
+      text-decoration: none;
+      color: #3d7ef8;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .search-again-link:hover {
+      color: #0056b3;
+      text-decoration: underline;
+      background-color: #e9ecef;
+    }
+
+  </style>
+
+    <h1>Hello Advisor!</h1>
+</html>
+
+<h2> You are Advising for the <strong>{{ Subject }}</strong> Department, Thank You! </h2>
+
+<br>
+
+<h2> Your Username is: <strong>{{ request.user.username }}</strong> </h2>
+
+<br>
+
+<h2> Here are the Schedules awaiting your approval: </h2>
+
+<br>
+
+{% if not noUsersBool %}
+
+  {% for advisee in advisee_profiles %}
+
+  <br>
+
+  <h2><strong> Schedule's Sent By {{ advisee.username }}:</strong></h2>
+
+  {% for schedule in advisee.schedules.all %}
+
+    {% if schedule.is_sent %}
+
+      <br>
+
+      <h3> Schedule: </h3>
+
+      <table>
+          <thead>
+              <tr>
+                  <th>Class Subject</th>
+                  <th>Class Number</th>
+                  <th>Catalog Number</th>
+                  <th>Class Type</th>
+                  <th>Class Description</th>
+                  <th>Class Instructor</th>
+                  <th>Class Days</th>
+                  <th>Class Start Time</th>
+                  <th>Class End Time</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for class in schedule.classes.all %}
+              <tr>
+                  <td> {{ class.subject}}</td>
+                  <td> {{ class.class_nbr }}</td>
+                  <td> {{ class.catalog_nbr }}</td>
+                  <td> {{ class.component }} </td>
+                  <td> {{ class.descr }}</td>
+                  <td> {{ class.instructor }}</td>
+                  <td> {{ class.days}}</td>
+                  <td> {{ class.start_time }}</td>
+                  <td> {{ class.end_time }}</td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+
+      {% if not schedule.is_approved %}
+
+      <form action = "/approveSchedule" method = "POST" class="search-again-link">
+        {% csrf_token %}
+        <input type = "hidden" name = "id" value ="{{schedule.id}}">
+        <button type = "submit"> Approve Schedule? </button>
+      </form>
+
+      {% endif %}
+
+      {% if schedule.is_approved %}
+
+      <form action = "/rejectSchedule" method = "POST" class="search-again-link">
+        {% csrf_token %}
+        <input type = "hidden" name = "id" value ="{{schedule.id}}">
+        <button type = "submit"> Reject Schedule? </button>
+      </form>
+
+      {% endif %}
+    {% endif %}
+    {% endfor %}
+  {% endfor %}
+{% endif %}
+
+{% if noUsersBool %}
+
+<h3> You Have 0 Currently Assigned Advisees</h3>
+
+{% endif %}
+
+<footer>
+  <form action = "/convertToUser" method = "POST"> 
+
+    {% csrf_token %}
+
+    <button type = "submit"> Convert Account To Student? (deletes data, but can convert back) </button>
+
+  </form>
+</footer>
+
+{% endblock %}
